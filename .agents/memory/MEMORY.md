@@ -1,0 +1,2 @@
+- [Orval v8.20 / zod v3 catalog mismatch](orval-zod-version-mismatch.md) — avoid `format: email`/`format: uri` in OpenAPI specs; generated code assumes zod v4 API.
+- [OpenAPI date fields vs Drizzle date-string columns](date-field-drizzle-zod-mismatch.md) — convert `Date` → `"YYYY-MM-DD"` before writing to `date`-mode-`"string"` Drizzle columns.
