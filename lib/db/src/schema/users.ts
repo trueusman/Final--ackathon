@@ -7,7 +7,7 @@ export const usersTable = pgTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  role: text("role", { enum: ["admin", "technician"] }).notNull(),
+  role: text("role", { enum: ["admin", "technician", "supervisor", "reporter"] }).notNull(),
   phone: text("phone"),
   avatarUrl: text("avatar_url"),
   active: boolean("active").notNull().default(true),

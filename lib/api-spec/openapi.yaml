@@ -512,6 +512,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
+  /public/issues/{issueNumber}/status:
+    post:
+      operationId: getPublicIssueStatus
+      tags: [public]
+      summary: Check the status of a previously-reported issue (no auth; requires the reporter's email as proof of ownership)
+      parameters:
+        - name: issueNumber
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicIssueStatusLookup"
+      responses:
+        "200":
+          description: Issue status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicIssueStatus"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
 
   # ---------- AI ----------
   /ai/triage:
@@ -1320,6 +1355,49 @@ components:
       properties:
         issueNumber: { type: string }
         status: { type: string }
+    PublicIssueStatusLookup:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string }
+    PublicIssueStatus:
+      type: object
+      required:
+        [
+          issueNumber,
+          title,
+          category,
+          priority,
+          status,
+          createdAt,
+          updatedAt,
+          recentActivity,
+        ]
+      properties:
+        issueNumber: { type: string }
+        title: { type: string }
+        category: { type: string }
+        priority: { type: string, enum: [low, medium, high, critical] }
+        status:
+          type: string
+          enum:
+            [
+              reported,
+              assigned,
+              inspection_started,
+              maintenance_in_progress,
+              waiting_for_parts,
+              resolved,
+              closed,
+              reopened,
+            ]
+        assignedTechnicianName: { type: ["string", "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicHistoryEntry"
     AiTriageInput:
       type: object
       required: [assetCode, title, description, category, priority]

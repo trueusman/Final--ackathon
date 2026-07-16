@@ -52,6 +52,8 @@ import type {
   PublicAsset,
   PublicIssueInput,
   PublicIssueReceipt,
+  PublicIssueStatus,
+  PublicIssueStatusLookup,
   RegisterInput,
   Technician,
   TechnicianInput,
@@ -1423,6 +1425,78 @@ export const useCreatePublicIssue = <TError = ErrorType<ErrorEnvelope>,
         TContext
       > => {
       return useMutation(getCreatePublicIssueMutationOptions(options));
+    }
+
+export const getGetPublicIssueStatusUrl = (issueNumber: string,) => {
+
+
+
+
+  return `/api/public/issues/${issueNumber}/status`
+}
+
+/**
+ * @summary Check the status of a previously-reported issue (no auth; requires the reporter's email as proof of ownership)
+ */
+export const getPublicIssueStatus = async (issueNumber: string,
+    publicIssueStatusLookup: PublicIssueStatusLookup, options?: RequestInit): Promise<PublicIssueStatus> => {
+
+  return customFetch<PublicIssueStatus>(getGetPublicIssueStatusUrl(issueNumber),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(publicIssueStatusLookup)
+  }
+);}
+
+
+
+
+
+export const getGetPublicIssueStatusMutationOptions = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPublicIssueStatus>>, TError,{issueNumber: string;data: BodyType<PublicIssueStatusLookup>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof getPublicIssueStatus>>, TError,{issueNumber: string;data: BodyType<PublicIssueStatusLookup>}, TContext> => {
+
+const mutationKey = ['getPublicIssueStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getPublicIssueStatus>>, {issueNumber: string;data: BodyType<PublicIssueStatusLookup>}> = (props) => {
+          const {issueNumber,data} = props ?? {};
+
+          return  getPublicIssueStatus(issueNumber,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GetPublicIssueStatusMutationResult = NonNullable<Awaited<ReturnType<typeof getPublicIssueStatus>>>
+    export type GetPublicIssueStatusMutationBody = BodyType<PublicIssueStatusLookup>
+    export type GetPublicIssueStatusMutationError = ErrorType<ErrorEnvelope>
+
+    /**
+ * @summary Check the status of a previously-reported issue (no auth; requires the reporter's email as proof of ownership)
+ */
+export const useGetPublicIssueStatus = <TError = ErrorType<ErrorEnvelope>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPublicIssueStatus>>, TError,{issueNumber: string;data: BodyType<PublicIssueStatusLookup>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof getPublicIssueStatus>>,
+        TError,
+        {issueNumber: string;data: BodyType<PublicIssueStatusLookup>},
+        TContext
+      > => {
+      return useMutation(getGetPublicIssueStatusMutationOptions(options));
     }
 
 export const getTriageIssueUrl = () => {

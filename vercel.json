@@ -1,0 +1,12 @@
+{
+  "buildCommand": "cd artifacts/maintainiq && pnpm install && pnpm run build",
+  "outputDirectory": "artifacts/maintainiq/dist",
+  "installCommand": "pnpm install",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

@@ -385,6 +385,47 @@ export interface PublicIssueReceipt {
   status: string;
 }
 
+export interface PublicIssueStatusLookup {
+  email: string;
+}
+
+export type PublicIssueStatusPriority = typeof PublicIssueStatusPriority[keyof typeof PublicIssueStatusPriority];
+
+
+export const PublicIssueStatusPriority = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  critical: 'critical',
+} as const;
+
+export type PublicIssueStatusStatus = typeof PublicIssueStatusStatus[keyof typeof PublicIssueStatusStatus];
+
+
+export const PublicIssueStatusStatus = {
+  reported: 'reported',
+  assigned: 'assigned',
+  inspection_started: 'inspection_started',
+  maintenance_in_progress: 'maintenance_in_progress',
+  waiting_for_parts: 'waiting_for_parts',
+  resolved: 'resolved',
+  closed: 'closed',
+  reopened: 'reopened',
+} as const;
+
+export interface PublicIssueStatus {
+  issueNumber: string;
+  title: string;
+  category: string;
+  priority: PublicIssueStatusPriority;
+  status: PublicIssueStatusStatus;
+  /** @nullable */
+  assignedTechnicianName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  recentActivity: PublicHistoryEntry[];
+}
+
 export type AiTriageInputPriority = typeof AiTriageInputPriority[keyof typeof AiTriageInputPriority];
 
 

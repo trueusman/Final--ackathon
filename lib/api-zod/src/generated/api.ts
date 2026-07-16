@@ -488,6 +488,34 @@ export const CreatePublicIssueResponse = zod.object({
 
 
 /**
+ * @summary Check the status of a previously-reported issue (no auth; requires the reporter's email as proof of ownership)
+ */
+export const GetPublicIssueStatusParams = zod.object({
+  "issueNumber": zod.coerce.string()
+})
+
+export const GetPublicIssueStatusBody = zod.object({
+  "email": zod.string()
+})
+
+export const GetPublicIssueStatusResponse = zod.object({
+  "issueNumber": zod.string(),
+  "title": zod.string(),
+  "category": zod.string(),
+  "priority": zod.enum(['low', 'medium', 'high', 'critical']),
+  "status": zod.enum(['reported', 'assigned', 'inspection_started', 'maintenance_in_progress', 'waiting_for_parts', 'resolved', 'closed', 'reopened']),
+  "assignedTechnicianName": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "recentActivity": zod.array(zod.object({
+  "date": zod.coerce.date(),
+  "action": zod.string(),
+  "status": zod.string().nullish()
+}))
+})
+
+
+/**
  * @summary Get AI-assisted issue triage suggestions (no auth, used before final submission)
  */
 

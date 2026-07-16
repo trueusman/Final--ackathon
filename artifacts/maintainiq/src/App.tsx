@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
-import { setAuthTokenGetter } from '@workspace/api-client-react';
+import { setAuthTokenGetter, setBaseUrl } from '@workspace/api-client-react';
 
 // Layouts
 import AuthLayout from './components/layouts/auth-layout';
@@ -24,6 +24,9 @@ import HistoryPage from './pages/history';
 import NotificationsPage from './pages/notifications';
 import SettingsPage from './pages/settings';
 import NotFound from '@/pages/not-found';
+
+// Configure API base URL (backend is on port 3000)
+setBaseUrl('http://localhost:3000');
 
 setAuthTokenGetter(() => {
   return localStorage.getItem('maintainiq_token');

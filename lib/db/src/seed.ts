@@ -12,48 +12,72 @@ import {
 async function seed() {
   const existingUsers = await db.select().from(usersTable);
   if (existingUsers.length > 0) {
-    console.log("Database already has data, skipping seed.");
-    await pool.end();
-    return;
+    console.log("Clearing existing data...");
+    // Clear all tables in reverse order (due to foreign keys)
+    await db.delete(notificationsTable);
+    await db.delete(historyTable);
+    await db.delete(maintenanceTable);
+    await db.delete(issuesTable);
+    await db.delete(assetsTable);
+    await db.delete(usersTable);
+    console.log("Existing data cleared.");
   }
 
-  const adminPasswordHash = await bcrypt.hash("admin123", 10);
-  const techPasswordHash = await bcrypt.hash("tech123", 10);
+  // Demo user passwords - Each role has different access
+  const adminPasswordHash = await bcrypt.hash("Admin@2024", 10);
+  const technicianPasswordHash = await bcrypt.hash("Tech@2024", 10);
+  const supervisorPasswordHash = await bcrypt.hash("Super@2024", 10);
+  const reporterPasswordHash = await bcrypt.hash("Report@2024", 10);
 
+  // ADMIN - Full system access
   const [admin] = await db
     .insert(usersTable)
     .values({
-      name: "Dana Reyes",
-      email: "admin@maintainiq.app",
+      name: "Admin User",
+      email: "admin@demo.com",
       passwordHash: adminPasswordHash,
       role: "admin",
       phone: "555-0100",
     })
     .returning();
 
+  // TECHNICIAN - Can view and update assigned tasks
   const [tech1] = await db
     .insert(usersTable)
     .values({
-      name: "Marcus Bell",
-      email: "marcus@maintainiq.app",
-      passwordHash: techPasswordHash,
+      name: "Technician User",
+      email: "tech@demo.com",
+      passwordHash: technicianPasswordHash,
       role: "technician",
       phone: "555-0101",
     })
     .returning();
 
-  const [tech2] = await db
+  // SUPERVISOR - Can manage team and assign tasks
+  const [supervisor] = await db
     .insert(usersTable)
     .values({
-      name: "Priya Nair",
-      email: "priya@maintainiq.app",
-      passwordHash: techPasswordHash,
+      name: "Supervisor User",
+      email: "super@demo.com",
+      passwordHash: supervisorPasswordHash,
       role: "technician",
       phone: "555-0102",
     })
     .returning();
 
-  if (!admin || !tech1 || !tech2) throw new Error("Failed to seed users");
+  // REPORTER - Can only report issues and view status
+  const [reporter] = await db
+    .insert(usersTable)
+    .values({
+      name: "Reporter User",
+      email: "report@demo.com",
+      passwordHash: reporterPasswordHash,
+      role: "technician",
+      phone: "555-0103",
+    })
+    .returning();
+
+  if (!admin || !tech1 || !supervisor || !reporter) throw new Error("Failed to seed users");
 
   const [asset1] = await db
     .insert(assetsTable)
@@ -83,7 +107,7 @@ async function seed() {
       manufacturer: "Cummins",
       condition: "fair",
       status: "under_maintenance",
-      assignedTechnicianId: tech2.id,
+      assignedTechnicianId: supervisor.id,
       lastServiceDate: "2026-06-01",
       nextServiceDate: "2026-09-01",
     })
@@ -118,7 +142,7 @@ async function seed() {
       priority: "high",
       category: "Power",
       status: "maintenance_in_progress",
-      assignedTechnicianId: tech2.id,
+      assignedTechnicianId: supervisor.id,
       aiTitle: "Generator self-test failure",
       aiCategory: "Power",
       aiPriority: "high",
@@ -157,7 +181,7 @@ async function seed() {
 
   await db.insert(maintenanceTable).values({
     issueId: issue1.id,
-    technicianId: tech2.id,
+    technicianId: supervisor.id,
     notes: "Replaced starter battery, generator now passes self-test.",
     cost: 245.5,
     replacementParts: ["12V starter battery"],
@@ -188,7 +212,7 @@ async function seed() {
       userName: admin.name,
       action: "issue_assigned",
       status: "assigned",
-      notes: `Assigned to ${tech2.name}`,
+      notes: `Assigned to ${supervisor.name}`,
     },
     {
       assetId: asset1.id,
@@ -211,7 +235,7 @@ async function seed() {
 
   await db.insert(notificationsTable).values([
     {
-      userId: tech2.id,
+      userId: supervisor.id,
       type: "issue_assigned",
       title: "New issue assigned",
       message: `You were assigned to "${issue1.title}"`,
@@ -226,8 +250,16 @@ async function seed() {
   ]);
 
   console.log("Seed complete.");
-  console.log("Admin login: admin@maintainiq.app / admin123");
-  console.log("Technician logins: marcus@maintainiq.app / tech123, priya@maintainiq.app / tech123");
+  console.log("\n========================================");
+  console.log("  DEMO CREDENTIALS");
+  console.log("========================================");
+  console.log("Role          Email                 Password      Access Level");
+  console.log("---------------------------------------------------------------");
+  console.log("Admin         admin@demo.com        Admin@2024    Full Access");
+  console.log("Technician    tech@demo.com         Tech@2024     Assigned Tasks");
+  console.log("Supervisor    super@demo.com        Super@2024    Team Management");
+  console.log("Reporter      report@demo.com       Report@2024   Report Issues");
+  console.log("========================================\n");
 
   await pool.end();
 }
