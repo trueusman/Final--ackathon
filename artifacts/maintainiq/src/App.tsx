@@ -25,8 +25,9 @@ import NotificationsPage from './pages/notifications';
 import SettingsPage from './pages/settings';
 import NotFound from '@/pages/not-found';
 
-// Configure API base URL (backend is on port 3000)
-setBaseUrl('http://localhost:3000');
+// Configure API base URL (backend is on Render or localhost)
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+setBaseUrl(apiUrl);
 
 setAuthTokenGetter(() => {
   return localStorage.getItem('maintainiq_token');
