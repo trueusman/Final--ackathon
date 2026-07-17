@@ -1,6 +1,6 @@
 {
   "framework": "vite",
-  "buildCommand": "pnpm run build:frontend",
+  "buildCommand": "pnpm --filter @workspace/maintainiq run build",
   "outputDirectory": "artifacts/maintainiq/dist",
   "installCommand": "pnpm install --no-frozen-lockfile"
 }
